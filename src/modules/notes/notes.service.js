@@ -1,7 +1,7 @@
 import prisma from '../../config/db.js';
 import { uploadBufferToCloudinary } from '../../utils/cloudinaryUpload.js';
 
-async function upsertNote(userId, roomId, { text }, file) {
+async function upsertNote(userId, roomId, { text } = {}, file) {
     const member = await prisma.roomMember.findUnique({
         where: { roomId_userId: { roomId, userId } },
     });

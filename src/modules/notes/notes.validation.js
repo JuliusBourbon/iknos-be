@@ -1,6 +1,6 @@
-function validateUpsertNote(body, file) {
+function validateUpsertNote(body = {}, file) {
     const errors = [];
-    const hasText = body.text && body.text.trim().length > 0;
+    const hasText = body && body.text && body.text.trim().length > 0;
     const hasImage = !!file;
 
     if (!hasText && !hasImage) {
