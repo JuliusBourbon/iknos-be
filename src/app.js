@@ -9,6 +9,7 @@ import { success } from './utils/apiResponse.js';
 import roomsRoutes from './modules/rooms/rooms.routes.js';
 import notesRoutes from './modules/notes/notes.routes.js';
 import usersRoutes from './modules/users/users.routes.js';
+import adminRoutes from './modules/admin/admin.routes.js';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomsRoutes);
 app.use('/api/notes', notesRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use(errorHandler);
 
