@@ -186,7 +186,7 @@ Format response konsisten di seluruh endpoint:
 | POST | `/auth/register` | Registrasi akun baru | ❌ |
 | POST | `/auth/login` | Login, mengembalikan JWT | ❌ |
 
-**POST `/auth/register`**
+**1. POST `/auth/register`**
 ```json
 // Request Body
 {
@@ -194,18 +194,42 @@ Format response konsisten di seluruh endpoint:
   "email": "budi@example.com",
   "password": "rahasia123"
 }
-```
 
-**POST `/auth/login`**
-```json
-// Request Body
-{ "email": "budi@example.com", "password": "rahasia123" }
-
-// Response
+// Response (201 Created)
 {
   "success": true,
+  "message": "Registrasi berhasil",
   "data": {
-    "user": { "id": "...", "username": "...", "email": "...", "avatarUrl": null },
+    "user": {
+      "id": "e5b8...",
+      "username": "budi123",
+      "email": "budi@example.com",
+      "createdAt": "2024-03-20T10:00:00Z"
+    },
+    "token": "eyJhbGciOi..."
+  }
+}
+```
+
+**2. POST `/auth/login`**
+```json
+// Request Body
+{
+  "email": "budi@example.com",
+  "password": "rahasia123"
+}
+
+// Response (200 OK)
+{
+  "success": true,
+  "message": "Login berhasil",
+  "data": {
+    "user": {
+      "id": "e5b8...",
+      "username": "budi123",
+      "email": "budi@example.com",
+      "avatarUrl": null
+    },
     "token": "eyJhbGciOi..."
   }
 }
@@ -220,10 +244,39 @@ Format response konsisten di seluruh endpoint:
 | GET | `/users/me` | Ambil profil user login | ✅ |
 | PUT | `/users/me/avatar` | Upload/update foto profil | ✅ |
 
-**PUT `/users/me/avatar`** — `multipart/form-data`
+**1. GET `/users/me`**
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "id": "e5b8...",
+    "username": "budi123",
+    "email": "budi@example.com",
+    "avatarUrl": "https://res.cloudinary.com/...",
+    "createdAt": "2024-03-20T10:00:00Z"
+  }
+}
+```
+
+**2. PUT `/users/me/avatar`**
+*Content-Type: `multipart/form-data`*
 | Field | Tipe | Wajib |
 |---|---|---|
 | `avatar` | File (JPEG/PNG/WEBP, max 5MB) | ✅ |
+
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "id": "e5b8...",
+    "username": "budi123",
+    "email": "budi@example.com",
+    "avatarUrl": "https://res.cloudinary.com/..."
+  }
+}
+```
 
 ---
 
@@ -239,23 +292,149 @@ Format response konsisten di seluruh endpoint:
 | GET | `/rooms/:roomId/requests` | List pending join request (owner only) | ✅ |
 | PATCH | `/rooms/requests/:requestId` | Approve/reject join request (owner only) | ✅ |
 
-**POST `/rooms`**
+**1. POST `/rooms`**
 ```json
 // Request Body
-{ "name": "Trip Bandung" }
+{
+  "name": "Trip Bandung"
+}
 
-// Response
-{ "success": true, "data": { "id": "...", "name": "Trip Bandung", "code": "X7K2P9", "ownerId": "..." } }
+// Response (201 Created)
+{
+  "success": true,
+  "message": "Room berhasil dibuat",
+  "data": {
+    "id": "abc1...",
+    "name": "Trip Bandung",
+    "code": "X7K2P9",
+    "ownerId": "e5b8..."
+  }
+}
 ```
 
-**POST `/rooms/join`**
+**2. GET `/rooms`**
 ```json
-{ "code": "X7K2P9" }
+// Response (200 OK)
+{
+  "success": true,
+  "data": [
+    {
+      "roomId": "abc1...",
+      "name": "Trip Bandung",
+      "code": "X7K2P9",
+      "isOwner": true,
+      "memberCount": 5,
+      "isHidden": false,
+      "joinedAt": "2024-03-20T10:05:00Z"
+    }
+  ]
+}
 ```
 
-**PATCH `/rooms/requests/:requestId`**
+**3. GET `/rooms/:roomId`**
 ```json
-{ "action": "approve" }   // atau "reject"
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "id": "abc1...",
+    "name": "Trip Bandung",
+    "code": "X7K2P9",
+    "ownerId": "e5b8...",
+    "createdAt": "2024-03-20T10:00:00Z",
+    "emptiedAt": null,
+    "members": [
+      {
+        "id": "mem1...",
+        "roomId": "abc1...",
+        "userId": "e5b8...",
+        "isHidden": false,
+        "lastLat": -6.200000,
+        "lastLng": 106.816666,
+        "lastUpdate": "2024-03-20T11:00:00Z",
+        "joinedAt": "2024-03-20T10:05:00Z",
+        "user": {
+          "id": "e5b8...",
+          "username": "budi123",
+          "avatarUrl": null
+        }
+      }
+    ]
+  }
+}
+```
+
+**4. POST `/rooms/join`**
+```json
+// Request Body
+{
+  "code": "X7K2P9"
+}
+
+// Response (201 Created)
+{
+  "success": true,
+  "message": "Permintaan bergabung terkirim, menunggu approval owner",
+  "data": {
+    "id": "req1...",
+    "roomId": "abc1...",
+    "userId": "f8c2...",
+    "status": "PENDING",
+    "createdAt": "2024-03-20T10:15:00Z",
+    "updatedAt": "2024-03-20T10:15:00Z"
+  }
+}
+```
+
+**5. DELETE `/rooms/:roomId/leave`**
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "message": "Berhasil keluar dari Room"
+  }
+}
+```
+
+**6. GET `/rooms/:roomId/requests`**
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": [
+    {
+      "id": "req1...",
+      "roomId": "abc1...",
+      "userId": "f8c2...",
+      "status": "PENDING",
+      "createdAt": "2024-03-20T10:15:00Z",
+      "updatedAt": "2024-03-20T10:15:00Z",
+      "user": {
+        "id": "f8c2...",
+        "username": "agus456",
+        "avatarUrl": "https://res.cloudinary.com/..."
+      }
+    }
+  ]
+}
+```
+
+**7. PATCH `/rooms/requests/:requestId`**
+```json
+// Request Body
+{
+  "action": "approve" // atau "reject"
+}
+
+// Response (200 OK)
+{
+  "success": true,
+  "message": "Permintaan berhasil disetujui",
+  "data": {
+    "status": "APPROVED"
+  }
+}
 ```
 
 **Aturan bisnis penting:**
@@ -275,11 +454,64 @@ Format response konsisten di seluruh endpoint:
 | GET | `/notes/:roomId` | List seluruh note member di Room | ✅ |
 | DELETE | `/notes/:roomId` | Hapus note milik user di Room | ✅ |
 
-**PUT `/notes/:roomId`** — `multipart/form-data`
+**1. PUT `/notes/:roomId`**
+*Content-Type: `multipart/form-data`*
 | Field | Tipe | Wajib |
 |---|---|---|
 | `text` | String (max 280 char) | Salah satu wajib (text/image) |
 | `image` | File (JPEG/PNG/WEBP, max 5MB) | Salah satu wajib (text/image) |
+
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "message": "Note berhasil disimpan",
+  "data": {
+    "id": "note1...",
+    "roomId": "abc1...",
+    "userId": "e5b8...",
+    "text": "Otw ke lokasi nih!",
+    "imageUrl": "https://res.cloudinary.com/...",
+    "createdAt": "2024-03-20T10:20:00Z",
+    "updatedAt": "2024-03-20T10:20:00Z"
+  }
+}
+```
+
+**2. GET `/notes/:roomId`**
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": [
+    {
+      "id": "note1...",
+      "roomId": "abc1...",
+      "userId": "e5b8...",
+      "text": "Otw ke lokasi nih!",
+      "imageUrl": "https://res.cloudinary.com/...",
+      "createdAt": "2024-03-20T10:20:00Z",
+      "updatedAt": "2024-03-20T10:20:00Z",
+      "user": {
+        "id": "e5b8...",
+        "username": "budi123",
+        "avatarUrl": "https://res.cloudinary.com/..."
+      }
+    }
+  ]
+}
+```
+
+**3. DELETE `/notes/:roomId`**
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "message": "Note berhasil dihapus"
+  }
+}
+```
 
 **Aturan bisnis penting:**
 - 1 user hanya boleh punya **1 note aktif per Room** — submit baru otomatis **overwrite** (tidak perlu hapus manual dulu).
