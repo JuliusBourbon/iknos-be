@@ -17,8 +17,7 @@ async function upsertNote(userId, roomId, { text } = {}, file) {
         where: { roomId_userId: { roomId, userId } },
         update: {
             text: text ?? null,
-            ...(imageUrl && { imageUrl }),
-            ...(!file && !text && {}), // no-op safety, dijaga di validasi
+            imageUrl: imageUrl ?? null,
         },
         create: {
             roomId,

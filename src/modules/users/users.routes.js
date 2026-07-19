@@ -9,5 +9,6 @@ router.use(authMiddleware);
 
 router.get('/me', controller.me);
 router.put('/me/avatar', upload.single('avatar'), controller.avatar);
+router.patch('/me/username', controller.username);
 
 export default router;

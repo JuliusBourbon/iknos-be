@@ -19,4 +19,13 @@ async function avatar(req, res) {
     }
 }
 
-export { me, avatar };
+async function username(req, res) {
+    try {
+        const user = await usersService.updateUsername(req.userId, req.body.username);
+        return success(res, user, 'Username berhasil diperbarui');
+    } catch (err) {
+        return error(res, err.message, err.statusCode || 500);
+    }
+}
+
+export { me, avatar, username };
