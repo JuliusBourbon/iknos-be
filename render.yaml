@@ -20,7 +20,15 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
-      - key: FRONTEND_URL
-        sync: false
-      - key: ADMIN_PASSWORD
-        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: ROOM_CODE_LENGTH
+        value: 6
+      - key: MAX_ROOM_PER_USER
+        value: 5
+      - key: MAX_MEMBER_PER_ROOM
+        value: 10
+      - key: LOCATION_UPDATE_INTERVAL_SEC
+        value: 10
+      - key: ROOM_EMPTY_GRACE_PERIOD_MIN
+        value: 30
