@@ -13,17 +13,22 @@ async function upsertNote(userId, roomId, { text } = {}, file) {
         imageUrl = result.secure_url;
     }
 
+    // Note otomatis kedaluwarsa 24 jam setelah dibuat/diperbarui
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     const note = await prisma.instaNote.upsert({
         where: { roomId_userId: { roomId, userId } },
         update: {
             text: text ?? null,
             imageUrl: imageUrl ?? null,
+            expiresAt,
         },
         create: {
             roomId,
             userId,
             text: text ?? null,
             imageUrl: imageUrl ?? null,
+            expiresAt,
         },
     });
 
@@ -36,8 +41,9 @@ async function getRoomNotes(userId, roomId) {
     });
     if (!member) throw { statusCode: 403, message: 'Kamu bukan anggota Room ini' };
 
+    // Hanya kembalikan note yang belum kedaluwarsa
     return prisma.instaNote.findMany({
-        where: { roomId },
+        where: { roomId, expiresAt: { gt: new Date() } },
         include: { user: { select: { id: true, username: true, avatarUrl: true } } },
         orderBy: { updatedAt: 'desc' },
     });
